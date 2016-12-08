@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+ 
+<!-- Set a style for our worldshape-data -->
+  <style>
+  path {
+    stroke: black;
+    stroke-width: 0.5px;
+    fill: white;
+    fill-opacity: 0;
+  }
+  </style>
+<body>
+ 
+  <!-- implementation of the hosted D3- and TopoJson js-libraries -->
+  <script src="http://d3js.org/d3.v3.js"></script>
+  <script src="http://d3js.org/topojson.v0.js"></script>
+  
+  <script src="http://benschmidt.org/colorbar/colorbar.js"></script>
+
+  <script>
+    myScale = d3.scale.linear().range(["red","white","blue"]).domain([0,4,25])
+
+    colorbar = Colorbar()
+            .origin([15,60])
+            .scale(myScale)
+            .orient("vertical")
+
+            placeholder = "#colorbar-here"
+
+            colorbarObject = d3.select(placeholder)
+            .call(colorbar)
+
+  </script>
+
+
+
+  <!-- map creation --> 
+  <script>
+  // canvas resolution
+  var width = 1000,
+      height = 600;
+ 
+  // projection-settings for mercator    
+//  var projection = d3.geo.mercator()
+  var projection = d3.geo.equirectangular()
+      // where to center the map in degrees
+      .center([0, 50 ])
+      // zoomlevel
+      .scale(100)
+      // map-rotation
+      .rotate([0,0]);
+ 
+  // defines "svg" as data type and "make canvas" command
+  var svg = d3.select("body").append("svg")
+      .attr("width", width)
+      .attr("height", height);
+ 
+  // defines "path" as return of geographic features
+  var path = d3.geo.path()
+      .projection(projection);
+ 
+  // group the svg layers 
+  var dataPoints = svg.append("g");
+  var worldMap = svg.append("g");
+ 
+
+  var mySquare = {
+      "type": "FeatureCollection",
+      "features": 
+          [
+          {
+          "type": "Feature",
+          "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                  [
+          [0,0],
+          [0,40],
+          [40,40],
+          [40,0],
+          [0,0],
+          ],
+        ]
+          },
+          "properties": {
+              "name": "[1,1]"
+          }
+          }
+      ]
+  };
+
+
+ var mySquare2 = dataPoints
+    .append("path")
+    .attr("d", path(mySquare))
+    .style("fill-opacity", 1)
+    .style("fill", "#FF00FF");
+    ;
+
+  // Make sure to put the map on top of the data
+  // load data and display the map on the canvas with country geometries
+  d3.json("world-110m.json", function(error, topology) {
+      worldMap.selectAll("path")
+        .data(topojson.object(topology, topology.objects.countries)
+            .geometries)
+      .enter()
+        .append("path")
+        .attr("d", path)
+  });
+ 
+  // zoom and pan functionality
+  /*var zoom = d3.behavior.zoom()
+      .on("zoom",function() {
+          g.attr("transform","translate("+ 
+              d3.event.translate.join(",")+")scale("+d3.event.scale+")");
+          g.selectAll("path")  
+              .attr("d", path.projection(projection)); 
+    });
+ 
+  svg.call(zoom)*/
+ 
+  </script>
+</body>
+</html>
+
