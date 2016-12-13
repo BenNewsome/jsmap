@@ -16,22 +16,10 @@
   <script src="http://d3js.org/d3.v3.js"></script>
   <script src="http://d3js.org/topojson.v0.js"></script>
   
-  <script src="http://benschmidt.org/colorbar/colorbar.js"></script>
+  <script src="colorbar.js"></script>
 
-  <script>
-    myScale = d3.scale.linear().range(["red","white","blue"]).domain([0,4,25])
 
-    colorbar = Colorbar()
-            .origin([15,60])
-            .scale(myScale)
-            .orient("vertical")
 
-            placeholder = "#colorbar-here"
-
-            colorbarObject = d3.select(placeholder)
-            .call(colorbar)
-
-  </script>
 
 
 
@@ -64,39 +52,61 @@
   var dataPoints = svg.append("g");
   var worldMap = svg.append("g");
  
+    // Colorbar scale
+    cbScale = d3.scale.linear()
+            .range(["white","purple"])
+            .domain([0,110])
 
   var mySquare = {
       "type": "FeatureCollection",
       "features": 
           [
           {
-          "type": "Feature",
-          "geometry": {
-              "type": "Polygon",
-              "coordinates": [
-                  [
-          [0,0],
-          [0,40],
-          [40,40],
-          [40,0],
-          [0,0],
-          ],
-        ]
-          },
-          "properties": {
-              "name": "[1,1]"
-          }
+              "type": "Feature",
+              "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [
+                      [
+                      [0,0],
+                      [0,40],
+                      [40,40],
+                      [40,0],
+                      [0,0],
+                      ],
+                ]
+              },
+              "properties": {
+                  "name": "[1,1]",
+                  "conc": 25,
+              }
           }
       ]
   };
 
 
- var mySquare2 = dataPoints
-    .append("path")
-    .attr("d", path(mySquare))
-    .style("fill-opacity", 1)
-    .style("fill", "#FF00FF");
-    ;
+// var mySquare2 = dataPoints
+//    .append("path")
+//    .attr("d", path(mySquare))
+//    .style("fill-opacity", 1)
+////    .style("fill", cbScale(25));
+//    .style("fill", function(d) {return cbScale(mySquare.features[0].properties.conc)});
+//    ;
+
+    
+
+   var ben =  d3.json("data.json", function(jsonData) {
+
+        dataPoints.selectAll("path")
+            .data(jsonData.features, )
+
+                
+
+            .enter().append("path")
+            .attr("d", path(d.geometry.coordinates)
+            .style("fill-opacity", 1)
+            .style("fill", function(d) {return cbScale(d.properties.conc)});
+    });
+
 
   // Make sure to put the map on top of the data
   // load data and display the map on the canvas with country geometries
@@ -120,6 +130,25 @@
  
   svg.call(zoom)*/
  
+
+    var colorbar = Colorbar()
+            .origin([25,50])
+            .scale(cbScale)
+            .orient("vertical")
+            .barlength(300)
+            .thickness(30)
+
+    placeholder = "#colorbar-here"
+
+    colorbarObject = d3.select(placeholder)
+    .call(colorbar)
+
+    bar =  d3.selectAll("svg").append("g").attr("id","colorbar")
+
+    pointer = d3.selectAll("#colorbar").call(colorbar)
+
+//    circles
+//        .on("mouseover",function(d) {pointer.pointTo(d[whichValue])})
   </script>
 </body>
 </html>
