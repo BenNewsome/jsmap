@@ -17,6 +17,9 @@
   var svg = d3.select("body").append("svg")
       .attr("width", width)
       .attr("height", height);
+
+        var tooltip = d3.select('body').append('div')
+            .attr('class', 'hidden tooltip');
  
   // defines "path" as return of geographic features
   var path = d3.geo.path()
@@ -102,6 +105,19 @@
          .attr("d", path)
                .style("fill", function(d) {return getColor(d)})
                .style("fill-opacity", 1.0)
+                .on('mousemove', function(d) {
+                    var mouse = d3.mouse(svg.node()).map(function(d) {
+                        return parseInt(d);
+                    });
+                    tooltip.classed('hidden', false)
+                        .attr('style', 'left:' + (mouse[0] + 15) +
+                                'px; top:' + (mouse[1] - 35) + 'px')
+                        .html(d.properties.name);
+                })
+                .on('mouseout', function() {
+                    tooltip.classed('hidden', true);
+                });
+
 });
 
 
