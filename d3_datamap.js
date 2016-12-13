@@ -23,8 +23,9 @@
       .projection(projection);
  
   // group the svg layers 
-  var testMap = svg.append("g");
+  // This is the order the layers appear. top is rendered first and subsequent are redered ontop.
   var dataMap = svg.append("g");
+  var testMap = svg.append("g");
   var worldMap = svg.append("g");
  
     // Colorbar scale
@@ -80,14 +81,13 @@
     .append("path")
     .attr("d", path)
     .style("fill-opacity", 0.5)
-    .style("fill", function(d) {return getColor(d)})
+//    .style("fill", function(d) {return getColor(d)})
 //    .attr("fill", function(d) {return test_getColor(d)})
-//    .style("fill", "pink")
+    .style("fill", "blue")
 //    .attr("fill", function(d) {return cbScale(d.properties.conc)});
     ;
-
     
-   var addDataPoints = d3.json("data.json", function(error, jsonData) {
+   var addDataPoints = d3.json("random.json", function(error, jsonData) {
          console.log("The json error is:");
          console.log(error);
          console.log("The json data is:");
@@ -101,7 +101,7 @@
          .append("path")
          .attr("d", path)
                .style("fill", function(d) {return getColor(d)})
-               .style("fill-opacity", 0.5)
+               .style("fill-opacity", 1.0)
 });
 
 

@@ -1,0 +1,38 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -170, 
+              -80
+            ], 
+            [
+              -170, 
+              -76
+            ], 
+            [
+              -165, 
+              -76
+            ], 
+            [
+              -165, 
+              -80
+            ], 
+            [
+              -170, 
+              -80
+            ]
+          ]
+        ] 
+      }, 
+      "properties": {
+        "conc": 23.609590432481596, 
+        "name": "23.6095904325 (ppbv)"
+      }
+    }]
+} 
