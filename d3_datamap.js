@@ -94,23 +94,17 @@
          console.log(jsonData);
          console.log("The first point is: " + jsonData.features[0].geometry.coordinates)
          console.log("The first color is: " + jsonData.features[0].properties.conc)
-      
-//         var dataPoints = jsonData.features;
-//         for (var i = 0; i < dataPoints.length; i++) {
-            dataMap.append("path")
-               .attr("d", path(jsonData))
-//               .style("fill", function(d) {return cbScale(d.properties.conc);})
+
+         dataMap.selectAll("path")
+         .data(jsonData.features)
+         .enter()
+         .append("path")
+         .attr("d", path)
+               .style("fill", function(d) {return getColor(d)})
                .style("fill-opacity", 0.5)
-               //.style("fill", "pink");
-//         }
 });
 
 
-//    .style("fill", function(d) {return cbScale(mySquare.features[0].properties.conc)});
-
-         
-  // Make sure to put the map on top of the data
-  // load data and display the map on the canvas with country geometries
   var addMap = d3.json("world-110m.json", function(error, topology) {
       worldMap.selectAll("path")
         .data(topojson.object(topology, topology.objects.countries)
@@ -131,7 +125,6 @@
  
   svg.call(zoom)*/
  
-/*
     var colorbar = Colorbar()
             .origin([25,50])
             .scale(cbScale)
@@ -148,7 +141,6 @@
 
     pointer = d3.selectAll("#colorbar").call(colorbar)
 
-*/
 
 //    circles
 //        .on("mouseover",function(d) {pointer.pointTo(d[whichValue])})a

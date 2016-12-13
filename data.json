@@ -20,6 +20,24 @@
                 "name": "[1,1]",
                 "conc": 25
             }
+       },{
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                    [40,0],
+                    [40,40],
+                    [80,40],
+                    [80,0],
+                    [40,0]
+                    ]
+                  ]
+            },
+            "properties": {
+                "name": "[1,1]",
+                "conc": 70
+            }
        }
        ]
 
