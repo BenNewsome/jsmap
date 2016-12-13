@@ -16,7 +16,9 @@
   // defines "svg" as data type and "make canvas" command
   var svg = d3.select("body").append("svg")
       .attr("width", width)
-      .attr("height", height);
+      .attr("height", height)
+      .attr("id", "map");
+      ;
 
         var tooltip = d3.select('body').append('div')
             .attr('class', 'hidden tooltip');
@@ -65,15 +67,8 @@
   };
 
  var getColor = function(d) {
-      console.log("d input: " + d);
       var outColor;
-      if(typeof d !== "undefined") {
-              outColor = cbScale(d.properties.conc)
-              console.log("Color for d: " + outColor);
-      } else {
-              console.log("d is undefined");
-              outColor = 1;
-      }
+      outColor = cbScale(d.properties.conc);
       return outColor};
 
  var test_getColor = function(d) { return "blue" };
@@ -90,7 +85,8 @@
 //    .attr("fill", function(d) {return cbScale(d.properties.conc)});
     ;
     
-   var addDataPoints = d3.json("random.json", function(error, jsonData) {
+   function addDataPoints(jsonFileName) {
+      d3.json(jsonFileName, function(error, jsonData) {
          console.log("The json error is:");
          console.log(error);
          console.log("The json data is:");
@@ -98,9 +94,10 @@
          console.log("The first point is: " + jsonData.features[0].geometry.coordinates)
          console.log("The first color is: " + jsonData.features[0].properties.conc)
 
-         dataMap.selectAll("path")
-         .data(jsonData.features)
-         .enter()
+
+         var dataPoints = dataMap.selectAll("path").data(jsonData.features)
+
+         dataPoints.enter()
          .append("path")
          .attr("d", path)
                .style("fill", function(d) {return getColor(d)})
@@ -119,15 +116,37 @@
                 });
 
 });
+};
 
+var spinTarget = document.getElementById('map');
+var opts = {
+  lines: 9, // The number of lines to draw
+  length: 9, // The length of each line
+  width: 5, // The line thickness
+  radius: 14, // The radius of the inner circle
+  color: '#EE3124', // #rgb or #rrggbb or array of colors
+  speed: 1.9, // Rounds per second
+  trail: 40, // Afterglow percentage
+  className: 'spinner', // The CSS class to assign to the spinner
+};
+var spinner = new Spinner(opts).spin(spinTarget);
+
+
+function removeDataPoints() {
+   spinner.spin();
+   dataMap.selectAll("path").remove();
+   spinner.stop();
+};
 
   var addMap = d3.json("world-110m.json", function(error, topology) {
+      spinner.spin();
       worldMap.selectAll("path")
         .data(topojson.object(topology, topology.objects.countries)
             .geometries)
       .enter()
         .append("path")
-        .attr("d", path)
+        .attr("d", path);
+      spinner.stop();
   });
  
   // zoom and pan functionality
