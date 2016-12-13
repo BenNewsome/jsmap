@@ -72,14 +72,19 @@
       }
       return outColor};
 
- var mySquare2 = testMap
+ var test_getColor = function(d) { return "blue" };
+
+ var mySquare2 = testMap.selectAll("path")
+   .data(mySquare.features)
+   .enter()
     .append("path")
-    .attr("d", path(mySquare))
- //   .attr("fill", getColor(d))
-    ;
+    .attr("d", path)
+    .style("fill-opacity", 0.5)
+    .style("fill", function(d) {return getColor(d)})
+//    .attr("fill", function(d) {return test_getColor(d)})
 //    .style("fill", "pink")
-//    .style("fill", function(d) {return cbScale(mySquare.features[0].properties.conc)});
-//    ;
+//    .attr("fill", function(d) {return cbScale(d.properties.conc)});
+    ;
 
     
    var addDataPoints = d3.json("data.json", function(error, jsonData) {
@@ -94,7 +99,7 @@
 //         for (var i = 0; i < dataPoints.length; i++) {
             dataMap.append("path")
                .attr("d", path(jsonData))
-               .style("fill", function(d) {return cbScale(d.properties.conc);})
+//               .style("fill", function(d) {return cbScale(d.properties.conc);})
                .style("fill-opacity", 0.5)
                //.style("fill", "pink");
 //         }
@@ -104,18 +109,6 @@
 //    .style("fill", function(d) {return cbScale(mySquare.features[0].properties.conc)});
 
          
-// Append all items to the datapoints map
-//        dataPoints.selectAll("path")
-//            .data(jsonData.features,
-//
-//                
-//
-//            .enter().append("path")
-//            .attr("d", path(d.geometry.coordinates)
-//            .style("fill-opacity", 1)
-//            .style("fill", function(d) {return cbScale(d.properties.conc)}));
-//    });
-//
   // Make sure to put the map on top of the data
   // load data and display the map on the canvas with country geometries
   var addMap = d3.json("world-110m.json", function(error, topology) {
