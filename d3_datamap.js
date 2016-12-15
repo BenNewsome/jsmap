@@ -1,8 +1,9 @@
  <!-- map creation --> 
   // canvas resolution
 
-jsonList = ["random.json", "data.json"];
-cb_colors = ["white", "purple"];
+jsonList = ["random.json", "data.json", "json/O3.json"];
+cb_color_list = [["white", "purple"], ["red", "blue"]];
+cbScheme = cb_color_list[0]
 
 function showLoader() {
    document.getElementById('loader').style.visibility='visible';
@@ -81,6 +82,7 @@ function loadpage() {
    showLoader();
 
    addDropDown();
+   addCbDropDown();
    addTitle();
    createMapContainer();
    createColorbar();
@@ -91,12 +93,8 @@ function loadpage() {
    };
 
 
-function updateColorbar(minmax) {
-   var min = minmax[0];
-   var max = minmax[1];
-   cbScale = d3.scale.linear()
-               .range(cb_colors)
-               .domain([min, max])
+
+function refreshColorbar() {
    colorbar = Colorbar()
             .origin([15,5])
             .scale(cbScale)
@@ -106,6 +104,25 @@ function updateColorbar(minmax) {
             ;
     pointer = d3.select(placeholder).call(colorbar);
 }
+function updateColorbarColors(cbScheme) {
+   cbScale = d3.scale.linear()
+               .range(cbScheme)
+               .domain([cbMin, cbMax])
+                ;
+    refreshColorbar();
+    // Reload the data
+    addDataPoints(d3.select('select').property('value'))
+}
+
+function updateColorbar(minmax) {
+   cbMin = minmax[0];
+   cbMax = minmax[1];
+   cbScale = d3.scale.linear()
+               .range(cbScheme)
+               .domain([cbMin, cbMax])
+                ;
+    refreshColorbar();
+}
 
 function createColorbar() {
   var bar =  d3.select("body").append("div")
@@ -114,7 +131,7 @@ function createColorbar() {
          ;
 
    cbScale = d3.scale.linear()
-            .range(["white","purple"])
+            .range(cbScheme)
             .domain([0,110])
 
    getColor = function(d) {
@@ -123,7 +140,10 @@ function createColorbar() {
       return outColor};
 
    console.log( "color 25 = " + cbScale(25));
+   placeholder = "#colorbar";
 
+    refreshColorbar();
+/*
    colorbar = Colorbar()
             .origin([15,5])
             .scale(cbScale)
@@ -132,9 +152,9 @@ function createColorbar() {
             .thickness(30)
             ;
 
-    placeholder = "#colorbar";
 
     pointer = d3.select(placeholder).call(colorbar);
+    */
 }
 
 function addDropDown() {
@@ -155,6 +175,25 @@ function addDropDown() {
               }
 }
 
+function addCbDropDown() {
+        var select = d3.select('body')
+                       .append('select')
+                       .attr('class','select')
+                       .attr('id', 'colorscheme')
+                       .on('change', onchange)
+
+        var options = select.selectAll('option')
+                      .data(cb_color_list).enter()
+                      .append('option')
+                      .text(function (d) {return d;});
+
+        function onchange() {
+              cbScheme = d3.select('#colorscheme').property('value').split(',');
+              console.log("changed to: " + cbScheme);
+//              cbScheme = "['"+selectValue[0]+"','"+selectValue[1]+"']"
+              updateColorbarColors(cbScheme)
+              }
+}
 
     
 function addDataPoints(jsonFileName) {
@@ -193,9 +232,9 @@ function addDataPoints(jsonFileName) {
                     });
                     pointer.pointTo(d.properties.conc);
                 })
-                .on('mouseout', function() {
-                    tooltip.classed('hidden', true);
-                });
+//                .on('mouseout', function() {
+//                    tooltip.classed('hidden', true);
+//                });
 
 });
 };
