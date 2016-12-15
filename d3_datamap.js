@@ -1,7 +1,7 @@
  <!-- map creation --> 
   // canvas resolution
 
-jsonList = ["random.json", "data.json", "json/O3.json"];
+jsonList = ["random.json", "data.json", "json/O3.json", "json/O3_difference.json", "json/O3_fractional.json"];
 cb_color_list = [["white", "purple"], ["red", "blue"]];
 cbScheme = cb_color_list[0]
 
