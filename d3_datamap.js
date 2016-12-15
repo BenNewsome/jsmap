@@ -186,6 +186,7 @@ function addDataPoints(jsonFileName) {
          .attr("d", path)
                .style("fill", function(d) {return getColor(d)})
                .style("fill-opacity", 1.0)
+               .style("stroke-width",0)
                 .on('mousemove', function(d) {
                     var mouse = d3.mouse(svg.node()).map(function(d) {
                         return parseInt(d);
