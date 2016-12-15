@@ -1,100 +1,205 @@
  <!-- map creation --> 
   // canvas resolution
-  var width = 800;
-  var height = 600;
 
-var width = document.body.clientWidth;
-var height = 0.5*width
+jsonList = ["random.json", "data.json"];
+cb_colors = ["white", "purple"];
 
-var scale = 100*(width/700)
- 
-  // projection-settings for mercator    
-//  var projection = d3.geo.mercator()
+function showLoader() {
+   document.getElementById('loader').style.visibility='visible';
+}
+
+function hideLoader() {
+   document.getElementById('loader').style.visibility='hidden';
+}
+
+function createMapContainer() {
   var projection = d3.geo.equirectangular()
       // where to center the map in degrees
       .center([0, 0 ])
       // zoomlevel
-      .scale(scale)
+      .scale(150*scale)
+      // Translate to the center of the div
+      .translate([480*scale, 250*scale])
       // map-rotation
-      .rotate([0,0]);
+      .rotate([0,0])
+      ;
+
+  map = d3.select("body").append("div")
+         .attr("id", "mapArea")
+         .attr("align","center")
+         .style("display","block")
+         .style("margin","auto")
+
+  svg = map.append("svg")
+      .attr("width", width)
+      .attr("height", height)
+      .attr("id", "map")
+      .attr("align","center")
+      .style("display","block")
+      .style("margin","auto")
+      ;
+  // defines "path" as return of geographic features
+  path = d3.geo.path()
+      .projection(projection);
  
-  // defines "svg" as data type and "make canvas" command
-  
+  // group the svg layers 
+  // This is the order the layers appear. top is rendered first and subsequent are redered ontop.
+  //var dataMap = svg.append("g").attr("transform", "translate(" + width/5 + "," + height/5 + ")");
+  dataMap = svg.append("g");
+  testMap = svg.append("g");
+  worldMap = svg.append("g");
+
+  // Add the world map
+  addWorldMap();
+}
+
+function addTitle() {
   var title = d3.select("body")
          .append("div")
          .attr("id","title")
          .attr("display", "block")
          .attr("margin", "auto")
          .append("p")
+         .attr("id", "title_text")
          .attr("width",width)
          .attr("height",height/5)
          .style("text-align", "center")
+         .style("font-size","2pc")
          .text("Title of Grapg")
 
+  title_text = document.getElementById("title_text")
+}
+   
+function loadpage() {
+  // Get the size of the page so the map fills 80% of it, and dont make it too big
+  scale = 0.8*Math.min(document.body.clientWidth/960, 2);
+  width = 960*scale;
+  height = 500*scale;
+
+   // Create the page in the following order
+
+   showLoader();
+
+   addDropDown();
+   addTitle();
+   createMapContainer();
+   createColorbar();
+   //addTestData();
+   addDataPoints("random.json");
+
+   hideLoader();
+   };
 
 
+function updateColorbar(minmax) {
+   var min = minmax[0];
+   var max = minmax[1];
+   cbScale = d3.scale.linear()
+               .range(cb_colors)
+               .domain([min, max])
+   colorbar = Colorbar()
+            .origin([15,5])
+            .scale(cbScale)
+            .orient("horizontal")
+            .barlength(0.7*width)
+            .thickness(30)
+            ;
+    pointer = d3.select(placeholder).call(colorbar);
+}
 
-  var map = d3.select("body").append("div")
-         .attr("id", "mapArea")
-         .style("text-align","center")
-         .style("display","block")
-         .style("margin","auto")
-
-
+function createColorbar() {
   var bar =  d3.select("body").append("div")
-//         .append("g")
          .attr("id","colorbar")
          .style("text-align","center")
          ;
 
-
-  var svg = map.append("svg")
-      .attr("width", width)
-      .attr("height", height)
-      .attr("id", "map")
-      ;
-
-        var tooltip = d3.select('body').append('div')
-            .attr('class', 'hidden tooltip');
-
- 
-  // defines "path" as return of geographic features
-  var path = d3.geo.path()
-      .projection(projection);
- 
-  // group the svg layers 
-  // This is the order the layers appear. top is rendered first and subsequent are redered ontop.
-  var dataMap = svg.append("g");
-  var testMap = svg.append("g");
-  var worldMap = svg.append("g");
- 
-    // Colorbar scale
-    cbScale = d3.scale.linear()
+   cbScale = d3.scale.linear()
             .range(["white","purple"])
             .domain([0,110])
 
+   getColor = function(d) {
+      var outColor;
+      outColor = cbScale(d.properties.conc);
+      return outColor};
+
    console.log( "color 25 = " + cbScale(25));
 
-
-    var colorbar = Colorbar()
-//            .origin([width/2,50])
+   colorbar = Colorbar()
+            .origin([15,5])
             .scale(cbScale)
-//            .orient("vertical")
             .orient("horizontal")
             .barlength(0.7*width)
             .thickness(30)
             ;
 
-    placeholder = "#colorbar-here";
+    placeholder = "#colorbar";
 
-    colorbarObject = d3.select(placeholder)
-    .call(colorbar)
-    ;
+    pointer = d3.select(placeholder).call(colorbar);
+}
+
+function addDropDown() {
+        var select = d3.select('body')
+                       .append('select')
+                       .attr('class','select')
+                       .on('change', onchange)
+
+        var options = select.selectAll('option')
+                      .data(jsonList).enter()
+                      .append('option')
+                      .text(function (d) {return d;});
+
+        function onchange() {
+              selectValue = d3.select('select').property('value');
+              console.log("changed to: " + selectValue);
+              addDataPoints( selectValue );
+              }
+}
+
+
     
+function addDataPoints(jsonFileName) {
 
-  pointer = d3.selectAll("#colorbar").call(colorbar);
 
+   showLoader();
+   // Remove any old data points
+   dataMap.selectAll("path").remove();
+   // Open the json file and do things with it
+   d3.json(jsonFileName, function(error, jsonData) {
+         hideLoader();
+         console.log("The json error is:");
+         console.log(error);
+         console.log("The json data is:");
+         console.log(jsonData);
+         console.log("The first point is: " + jsonData.features[0].geometry.coordinates)
+         console.log("The first color is: " + jsonData.features[0].properties.conc)
 
+         // Update the title
+         title_text.innerHTML=jsonData.title;
+
+         // Update the colorbar
+         updateColorbar([jsonData.minData,jsonData.maxData]);
+
+         var dataPoints = dataMap.selectAll("path").data(jsonData.features)
+
+         dataPoints.enter()
+         .append("path")
+         .attr("d", path)
+               .style("fill", function(d) {return getColor(d)})
+               .style("fill-opacity", 1.0)
+                .on('mousemove', function(d) {
+                    var mouse = d3.mouse(svg.node()).map(function(d) {
+                        return parseInt(d);
+                    });
+                    pointer.pointTo(d.properties.conc);
+                })
+                .on('mouseout', function() {
+                    tooltip.classed('hidden', true);
+                });
+
+});
+};
+
+function addTestData() { 
 
   var mySquare = {
       "type": "FeatureCollection",
@@ -122,85 +227,17 @@ var scale = 100*(width/700)
       ]
   };
 
- var getColor = function(d) {
-      var outColor;
-      outColor = cbScale(d.properties.conc);
-      return outColor};
-
- var test_getColor = function(d) { return "blue" };
-
  var mySquare2 = testMap.selectAll("path")
    .data(mySquare.features)
    .enter()
     .append("path")
     .attr("d", path)
     .style("fill-opacity", 0.5)
-//    .style("fill", function(d) {return getColor(d)})
-//    .attr("fill", function(d) {return test_getColor(d)})
     .style("fill", "blue")
-//    .attr("fill", function(d) {return cbScale(d.properties.conc)});
     ;
-
-
-function showLoader() {
-   document.getElementById('loader').style.visibility='visible';
 }
 
-function hideLoader() {
-   document.getElementById('loader').style.visibility='hidden';
-}
-
-
-function removeDataPoints() {
-   showLoader();
-   dataMap.selectAll("path").remove();
-   hideLoader();
-};
-    
-   function addDataPoints(jsonFileName) {
-   showLoader();
-      d3.json(jsonFileName, function(error, jsonData) {
-           hideLoader();
-         console.log("The json error is:");
-         console.log(error);
-         console.log("The json data is:");
-         console.log(jsonData);
-         console.log("The first point is: " + jsonData.features[0].geometry.coordinates)
-         console.log("The first color is: " + jsonData.features[0].properties.conc)
-
-
-         // Set the title
-//         title.append("text").attr("x",width/2).attr("y", 0-(margin.top / 2)).text("My Ttitle")
-
-
-
-         var dataPoints = dataMap.selectAll("path").data(jsonData.features)
-
-         dataPoints.enter()
-         .append("path")
-         .attr("d", path)
-               .style("fill", function(d) {return getColor(d)})
-               .style("fill-opacity", 1.0)
-                .on('mousemove', function(d) {
-                    var mouse = d3.mouse(svg.node()).map(function(d) {
-                        return parseInt(d);
-                    });
-  /*                  tooltip.classed('hidden', false)
-                        .attr('style', 'left:' + (mouse[0] + 15) +
-                                'px; top:' + (mouse[1] - 35) + 'px')
-                        .html(d.properties.name);
- */                   pointer.pointTo(d.properties.conc);
-                })
-                .on('mouseout', function() {
-                    tooltip.classed('hidden', true);
-                });
-
-});
-};
-
-
-
-
+function addWorldMap() {
   var addMap = d3.json("world-110m.json", function(error, topology) {
       worldMap.selectAll("path")
         .data(topojson.object(topology, topology.objects.countries)
@@ -209,36 +246,4 @@ function removeDataPoints() {
         .append("path")
         .attr("d", path);
   });
- 
-  // zoom and pan functionality
-  /*var zoom = d3.behavior.zoom()
-      .on("zoom",function() {
-          g.attr("transform","translate("+ 
-              d3.event.translate.join(",")+")scale("+d3.event.scale+")");
-          g.selectAll("path")  
-              .attr("d", path.projection(projection)); 
-    });
- 
-  svg.call(zoom)*/
- 
-
-
-
-//    bar =  d3.selectAll("svg").append("g").attr("id","colorbar");
-
-
-/*
-   // Dropdown options
-   d3.select(".demoSelection")
-      .append("option")
-      .attr("value",1)
-      .text("Hello");
-   d3.select(".demoSelection")
-      .append("option")
-      .attr("value",2)
-      .text("Hello there");
-*/
-
-//    circles
-//        .on("mouseover",function(d) {pointer.pointTo(d[whichValue])})a
-
+}
