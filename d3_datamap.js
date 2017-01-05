@@ -1,8 +1,8 @@
  <!-- map creation --> 
   // canvas resolution
 
-jsonList = ["random.json", "data.json", "json/O3.json"];
-cb_color_list = [["white", "purple"], ["red", "blue"]];
+jsonList = ["random.json", "data.json", "json/O3.json", "json/O3_difference.json", "json/O3_fractional.json"];
+cb_color_list = [["white", "purple"], ["red", "blue"], ["red", "white", "blue"]];
 cbScheme = cb_color_list[0]
 
 function showLoader() {
@@ -117,9 +117,16 @@ function updateColorbarColors(cbScheme) {
 function updateColorbar(minmax) {
    cbMin = minmax[0];
    cbMax = minmax[1];
+//   if cbScheme legnth is 3 then add a midpoint, else only have two points in the domain.
+   if (cbScheme.length==3) {
+	   cbMid = ( cbMin + cbMax ) / 2.0
+	   cbDomain = [cbMin, cbMid, cbMax]
+   } else {
+	   cbDomain = [cbMin, cbMax]
+   }
    cbScale = d3.scale.linear()
                .range(cbScheme)
-               .domain([cbMin, cbMax])
+               .domain(cbDomain)
                 ;
     refreshColorbar();
 }
