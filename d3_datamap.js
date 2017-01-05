@@ -2,7 +2,11 @@
   // canvas resolution
 
 jsonList = ["random.json", "data.json", "json/O3.json", "json/O3_difference.json", "json/O3_fractional.json"];
+<<<<<<< HEAD
 cb_color_list = [["white", "purple"], ["red", "blue"], ["red", "white", "blue"]];
+=======
+cb_color_list = [["white", "purple"], ["red", "blue"]];
+>>>>>>> 278e7ee96fa62165080094029b33284fe4b5c1b9
 cbScheme = cb_color_list[0]
 
 function showLoader() {
