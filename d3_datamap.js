@@ -83,7 +83,15 @@ function addTitle() {
    
 function loadpage() {
   // Get the size of the page so the map fills 80% of it, and dont make it too big
-  scale = 0.8*Math.min(document.body.clientWidth/960, 2);
+  
+
+  var body = document.body, html = document.documentElement;
+
+  var documentHeight = Math.max( body.scrollHeight, body.offsetHeight, 
+                               html.clientHeight, html.scrollHeight, html.offsetHeight );
+  heightScale = 0.8*Math.min(documentHeight/700, 2);
+  widthScale = 0.8*Math.min(body.clientWidth/960, 2);
+  scale = Math.min(heightScale, widthScale)
   width = 960*scale;
   height = 500*scale;
 
