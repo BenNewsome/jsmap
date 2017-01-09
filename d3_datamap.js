@@ -1,12 +1,18 @@
  <!-- map creation --> 
   // canvas resolution
 
-jsonList = ["random.json", "data.json", "json/O3.json", "json/O3_difference.json", "json/O3_fractional.json"];
-<<<<<<< HEAD
+jsonList = ["random.json", "data.json"];
+
+species_list = ["ALD2", "C2H6", "CO", "ISOP", "NO2", "NO", "O3", "OH", "SO2"];
+
+for (var i in species_list) {
+	species = species_list[i];
+	jsonList.push( "json/" + species + ".json" );
+	jsonList.push( "json/" + species + "_difference.json" );
+	jsonList.push( "json/" + species + "_fractional.json" );
+};
+
 cb_color_list = [["white", "purple"], ["red", "blue"], ["red", "white", "blue"]];
-=======
-cb_color_list = [["white", "purple"], ["red", "blue"]];
->>>>>>> 278e7ee96fa62165080094029b33284fe4b5c1b9
 cbScheme = cb_color_list[0]
 
 function showLoader() {
@@ -119,11 +125,16 @@ function updateColorbarColors(cbScheme) {
 }
 
 function updateColorbar(minmax) {
-   cbMin = minmax[0];
-   cbMax = minmax[1];
-//   if cbScheme legnth is 3 then add a midpoint, else only have two points in the domain.
+   cbMin = parseInt(minmax[0]);
+   cbMax = parseInt(minmax[1]);
+//   if cbScheme legnth is 3 then add a midpoint, else only have two points in the domain. 
+// Set mid at 0 if -ve to posative
    if (cbScheme.length==3) {
-	   cbMid = ( cbMin + cbMax ) / 2.0
+	   if ( cbMin < 0 && cbMax > 0 ) {
+		   cbMid = 0
+	   } else {
+		   cbMid = ( cbMin + cbMax ) / 2.0
+	   }
 	   cbDomain = [cbMin, cbMid, cbMax]
    } else {
 	   cbDomain = [cbMin, cbMax]
